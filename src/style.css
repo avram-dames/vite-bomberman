@@ -26,6 +26,7 @@ body {
   justify-content: center;
   min-width: 320px;
   min-height: 100vh;
+  background-color: antiquewhite;
 }
 
 h1 {
@@ -39,7 +40,8 @@ h1 {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   width: 200px;
   height: 200px;
-  border: 1px solid rebeccapurple;
+  background-color: white;
+  /* border: 1px solid rebeccapurple; */
 }
 
 .square {
@@ -62,7 +64,7 @@ h1 {
 }
 
 .wall {
-  background-image: url(images/steel.png);
+  background-image: url(images/tree.jpg);
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
