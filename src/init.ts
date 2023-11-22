@@ -7,34 +7,26 @@ window.addEventListener(
     if (event.defaultPrevented) {
       return; // Do nothing if event already handled
     }
+    console.log(`${event.code} key pressed.`);
 
     switch (event.code) {
       case "KeyS":
       case "ArrowDown":
-        // Handle "back"
-        console.log("back");
         game.movePlayer("down");
         break;
       case "KeyW":
       case "ArrowUp":
-        // Handle "forward"
-        console.log("forward");
         game.movePlayer("up");
         break;
       case "KeyA":
       case "ArrowLeft":
-        // Handle "turn left"
-        console.log("left");
         game.movePlayer("left");
         break;
       case "KeyD":
       case "ArrowRight":
-        // Handle "turn right"
-        console.log("right");
         game.movePlayer("right");
         break;
       case "Space":
-        // Handle "turn right"
         console.log("space");
         break;
     }
