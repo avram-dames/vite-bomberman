@@ -1,52 +1,23 @@
-import game from "./game";
-import { renderGridElements } from "./ui";
+import game from "./gameState.ts";
+import { TICK_RATE } from "./constants.ts";
+// import initButtons from "./buttons";
 
-window.addEventListener(
-  "keydown",
-  (event) => {
-    if (event.defaultPrevented) {
-      return; // Do nothing if event already handled
-    }
-    console.log(`${event.code} key pressed.`);
+async function init() {
+  console.log("starting game");
+  //   initButtons(handleUserAction);
+  let nextTimeToTick = Date.now();
 
-    switch (event.code) {
-      case "KeyS":
-      case "ArrowDown":
-        game.movePlayer("down");
-        break;
-      case "KeyW":
-      case "ArrowUp":
-        game.movePlayer("up");
-        break;
-      case "KeyA":
-      case "ArrowLeft":
-        game.movePlayer("left");
-        break;
-      case "KeyD":
-      case "ArrowRight":
-        game.movePlayer("right");
-        break;
-      case "Space":
-        console.log("space");
-        break;
+  function nextAnimationFrame() {
+    const now = Date.now();
+
+    if (nextTimeToTick <= now) {
+      game.tick();
+      nextTimeToTick = now + TICK_RATE;
     }
 
-    if (event.code !== "Tab") {
-      // Consume the event so it doesn't get handled twice,
-      // as long as the user isn't trying to move focus away
-      event.preventDefault();
-    }
-  },
-  true,
-);
+    requestAnimationFrame(nextAnimationFrame);
+  }
+  requestAnimationFrame(nextAnimationFrame);
+}
 
-document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
-  <div class="grid">
-    <div class="player" 
-      style={top: ${game.playerPosition[0] * 100}px; left: ${
-        game.playerPosition[1] * 100
-      }px;}>
-    </div>
-    ${renderGridElements(game.grid)}
-  </div>
-`;
+init();
