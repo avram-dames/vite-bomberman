@@ -8,7 +8,7 @@ interface GameState {
   playerPosition: Position;
   grid: Grid;
   gridSize: number;
-  bombQueue: undefined;
+  bombQueue: [];
   validatePlayerPosition: (grid: Grid, position: Position) => number;
   setNewPlayerPosition: (position: Position) => void;
   movePlayer: (direction: Direction) => void;
