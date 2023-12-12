@@ -8,7 +8,8 @@ function updateUI(position: Position): void {
 }
 
 function updateTimer(time: number) {
-  document.querySelector<HTMLDivElement>(".timer")!.innerHTML = `Time: ${time}`;
+  const timer = document.querySelector<HTMLDivElement>(".timer")!;
+  if (timer) timer.innerHTML = `Time: ${time}`;
 }
 
 function updateGrid(grid: Grid): void {

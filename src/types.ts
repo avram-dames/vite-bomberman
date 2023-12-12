@@ -6,16 +6,14 @@ type Direction = "left" | "right" | "up" | "down";
 
 type Bomb = {
   position: Position;
-  detonateTime: number;
+  time: number;
 };
 
 type Fire = {
   position: Position;
   spread: number;
-  clearTime: number;
+  time: number;
 };
-
-type BombQueue = Bomb[];
 
 type FireQueue = Fire[];
 
@@ -24,19 +22,19 @@ interface GameState {
   playerPosition: Position;
   grid: Grid;
   gridSize: number;
-  bombQueue: BombQueue;
+  bombQueue: Bomb[];
   bombTime: number;
   fireTime: number;
   fireQueue: FireQueue;
   fireSpread: number;
-  validatePlayerPosition: (grid: Grid, position: Position) => number;
+  validatePlayerPosition: (position: Position) => number;
   setNewPlayerPosition: (position: Position) => void;
   movePlayer: (direction: Direction) => void;
-  tick: () => number;
-  placeBomb: () => void;
-  detonateBomb: (position: Position) => void;
-  checkForBombsToExplode: () => void;
-  checkForFiresToClear: () => void;
+  tick: () => void;
+  placeBomb: () => boolean;
+  detonateBombs: () => void;
+  detonateBomb: (bomb: Bomb) => void;
+  clearFires: () => void;
   clearFire: (fire: Fire) => void;
 }
 

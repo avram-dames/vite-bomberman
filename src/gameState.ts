@@ -1,5 +1,5 @@
 import { GameState, Direction, Bomb, Fire } from "./types";
-import { updateUI, updateTimer, updateGrid } from "./ui";
+import { updateTimer, updateGrid } from "./ui";
 
 const game: GameState = {
   clock: -1,
@@ -14,36 +14,36 @@ const game: GameState = {
   gridSize: 2,
   bombQueue: [],
   bombTime: 3,
-  fireTime: 1,
   fireQueue: [],
+  fireTime: 1,
   fireSpread: 1,
 
   tick() {
     this.clock++;
     updateTimer(this.clock);
-    this.checkForBombsToExplode();
-    this.checkForFiresToClear();
-    return this.clock;
+    this.detonateBombs();
+    this.clearFires();
   },
 
-  validatePlayerPosition(grid, position) {
+  validatePlayerPosition(position) {
+    /**
+     * Returns 1 if position is within the gird,
+     * 0 otherwise. The return value can be used
+     * to update the player's position.
+     */
     return position[0] >= 0 &&
       position[0] <= this.gridSize - 1 &&
       position[1] >= 0 &&
       position[1] <= this.gridSize - 1 &&
-      grid[position[0]][position[1]] == 0
+      this.grid[position[0]][position[1]] == 0
       ? 1
       : 0;
   },
 
   setNewPlayerPosition(position) {
-    const newPositionIsValid = this.validatePlayerPosition(this.grid, position);
-    console.log(`validate position: ${position} -> ${newPositionIsValid}`);
-
-    if (newPositionIsValid) {
+    if (this.validatePlayerPosition(position)) {
       game.playerPosition[0] = position[0];
       game.playerPosition[1] = position[1];
-      console.log("new position set at:", game.playerPosition);
     }
   },
 
@@ -70,50 +70,33 @@ const game: GameState = {
       default:
         break;
     }
-    updateUI(this.playerPosition);
   },
 
   placeBomb() {
+    /**
+     * Place a bomb at current player's position
+     * and return true if it is allowed. Return false
+     * not implemented yet.
+     */
     const newBomb: Bomb = {
       position: [...this.playerPosition],
-      detonateTime: this.clock + this.bombTime,
+      time: this.clock + this.bombTime,
     };
-    const [x, y] = newBomb.position;
-    this.grid[x][y] = 3;
+    const [top, right] = newBomb.position;
+    this.grid[top][right] = 3;
     this.bombQueue.push(newBomb);
-    updateGrid(this.grid);
+    return true;
   },
 
-  checkForBombsToExplode() {
-    console.log("check bombs");
-    if (this.bombQueue.length === 0) return;
-    console.log("bombs found");
-    const bomb = this.bombQueue.pop();
-    console.log("check bomb", bomb);
-    if (bomb.detonateTime > this.clock) {
-      this.bombQueue.push(bomb);
-      return;
+  clearFires() {
+    if (this.fireQueue.length) {
+      for (const fire of checkForItemsReadyToAction(
+        this.fireQueue,
+        this.clock,
+      )) {
+        this.clearFire(fire);
+      }
     }
-
-    this.detonateBomb(bomb.position);
-    this.checkForBombsToExplode();
-  },
-
-  checkForFiresToClear() {
-    console.log("check for fires", this.fireQueue);
-
-    if (this.fireQueue.length === 0) return;
-
-    const fire = this.fireQueue.pop();
-    console.log("fire", fire);
-
-    if (fire.clearTime > this.clock) {
-      this.fireQueue.push(fire);
-      return;
-    }
-
-    this.clearFire(fire);
-    this.checkForFiresToClear();
   },
 
   clearFire(fire) {
@@ -128,16 +111,25 @@ const game: GameState = {
     updateGrid(this.grid);
   },
 
-  detonateBomb(position) {
-    console.log(`Boom at ${position}`);
+  detonateBombs() {
+    if (this.bombQueue.length) {
+      for (const bomb of checkForItemsReadyToAction(
+        this.bombQueue,
+        this.clock,
+      )) {
+        this.detonateBomb(bomb);
+      }
+    }
+  },
 
+  detonateBomb(bomb) {
     const newFire: Fire = {
-      position: [...position],
+      position: [...bomb.position],
       spread: this.fireSpread,
-      clearTime: this.clock + this.fireTime,
+      time: this.clock + this.fireTime,
     };
 
-    const [x, y] = [...position];
+    const [x, y] = [...bomb.position];
     this.grid[x][y] = 4;
     for (let index = 1; index < newFire.spread + 1; index++) {
       if (this.grid[x - index]) this.grid[x - index][y] = 4;
@@ -151,4 +143,21 @@ const game: GameState = {
   },
 };
 
-export default game;
+function isTimeToAction(item: Bomb | Fire, currentTime: number): boolean {
+  if (item.time <= currentTime) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function* checkForItemsReadyToAction(
+  queue: Bomb[] | Fire[],
+  currentTime: number,
+): Generator<Bomb | Fire> {
+  for (const item of queue) {
+    if (isTimeToAction(item, currentTime)) yield item;
+  }
+}
+
+export { game, isTimeToAction, checkForItemsReadyToAction };

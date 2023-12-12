@@ -1,4 +1,4 @@
-import game from "./gameState.ts";
+import { game } from "./gameState.ts";
 import { TICK_RATE } from "./constants.ts";
 // import initButtons from "./buttons";
 

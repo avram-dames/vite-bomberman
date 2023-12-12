@@ -1,8 +1,8 @@
 import "./style.css";
 import "./init";
 
-import game from "./gameState";
-import { renderGridElements } from "./ui";
+import { game } from "./gameState";
+import { renderGridElements, updateUI, updateGrid } from "./ui";
 
 window.addEventListener(
   "keydown",
@@ -31,7 +31,10 @@ window.addEventListener(
         break;
       case "Space":
         console.log("space");
-        game.placeBomb();
+        const bombPlaced = game.placeBomb();
+        if (bombPlaced) {
+          updateGrid(game.grid);
+        }
         break;
     }
 
@@ -40,6 +43,8 @@ window.addEventListener(
       // as long as the user isn't trying to move focus away
       event.preventDefault();
     }
+
+    updateUI(game.playerPosition);
   },
   true,
 );
