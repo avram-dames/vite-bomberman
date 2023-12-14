@@ -3,6 +3,9 @@ import "./init";
 
 import { game } from "./gameState";
 import { renderGridElements, updateUI, updateGrid } from "./ui";
+import RoboPlayer from "./components/robo-player.ts";
+
+new RoboPlayer();
 
 window.addEventListener(
   "keydown",
@@ -51,11 +54,7 @@ window.addEventListener(
 
 document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
     <div class="dashboard">
-      <div class="player" 
-        style={top: ${game.playerPosition[0] * 100}px; left: ${
-          game.playerPosition[1] * 100
-        }px;}>
-      </div>
+      <robo-player></robo-player>
       <div class="grid">
         ${renderGridElements(game.grid)}
       </div>

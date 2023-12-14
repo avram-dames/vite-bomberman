@@ -1,6 +1,6 @@
 type Grid = number[][];
 
-type Position = number[];
+type Position = [number, number]; // [top, right]
 
 type Direction = "left" | "right" | "up" | "down";
 
@@ -27,9 +27,7 @@ interface GameState {
   fireTime: number;
   fireQueue: FireQueue;
   fireSpread: number;
-  validatePlayerPosition: (position: Position) => number;
-  setNewPlayerPosition: (position: Position) => void;
-  movePlayer: (direction: Direction) => void;
+
   tick: () => void;
   placeBomb: () => boolean;
   detonateBombs: () => void;

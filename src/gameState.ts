@@ -25,53 +25,6 @@ const game: GameState = {
     this.clearFires();
   },
 
-  validatePlayerPosition(position) {
-    /**
-     * Returns 1 if position is within the gird,
-     * 0 otherwise. The return value can be used
-     * to update the player's position.
-     */
-    return position[0] >= 0 &&
-      position[0] <= this.gridSize - 1 &&
-      position[1] >= 0 &&
-      position[1] <= this.gridSize - 1 &&
-      this.grid[position[0]][position[1]] == 0
-      ? 1
-      : 0;
-  },
-
-  setNewPlayerPosition(position) {
-    if (this.validatePlayerPosition(position)) {
-      game.playerPosition[0] = position[0];
-      game.playerPosition[1] = position[1];
-    }
-  },
-
-  movePlayer(direction: Direction) {
-    const nextPosition = [...this.playerPosition];
-
-    switch (direction) {
-      case "up":
-        nextPosition[0] -= 1;
-        this.setNewPlayerPosition(nextPosition);
-        break;
-      case "down":
-        nextPosition[0] += 1;
-        this.setNewPlayerPosition(nextPosition);
-        break;
-      case "left":
-        nextPosition[1] -= 1;
-        this.setNewPlayerPosition(nextPosition);
-        break;
-      case "right":
-        nextPosition[1] += 1;
-        this.setNewPlayerPosition(nextPosition);
-        break;
-      default:
-        break;
-    }
-  },
-
   placeBomb() {
     /**
      * Place a bomb at current player's position
