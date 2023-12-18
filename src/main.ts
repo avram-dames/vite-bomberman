@@ -1,11 +1,13 @@
 import "./style.css";
 import "./init";
-
+console.log("running main");
 import { game } from "./gameState";
-import { renderGridElements, updateUI, updateGrid } from "./ui";
 import RoboPlayer from "./components/robo-player.ts";
+import GameBoard from "./components/game-board.ts";
 
 new RoboPlayer();
+
+customElements.define("game-board", GameBoard);
 
 window.addEventListener(
   "keydown",
@@ -18,26 +20,23 @@ window.addEventListener(
     switch (event.code) {
       case "KeyS":
       case "ArrowDown":
-        game.movePlayer("down");
+        game.player.move("down", game.grid);
         break;
       case "KeyW":
       case "ArrowUp":
-        game.movePlayer("up");
+        game.player.move("up", game.grid);
         break;
       case "KeyA":
       case "ArrowLeft":
-        game.movePlayer("left");
+        game.player.move("left", game.grid);
         break;
       case "KeyD":
       case "ArrowRight":
-        game.movePlayer("right");
+        game.player.move("right", game.grid);
         break;
       case "Space":
         console.log("space");
-        const bombPlaced = game.placeBomb();
-        if (bombPlaced) {
-          updateGrid(game.grid);
-        }
+        game.player.placeBomb();
         break;
     }
 
@@ -46,8 +45,6 @@ window.addEventListener(
       // as long as the user isn't trying to move focus away
       event.preventDefault();
     }
-
-    updateUI(game.playerPosition);
   },
   true,
 );
@@ -55,9 +52,7 @@ window.addEventListener(
 document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
     <div class="dashboard">
       <robo-player></robo-player>
-      <div class="grid">
-        ${renderGridElements(game.grid)}
-      </div>
+      <game-board data-grid="${JSON.stringify(game.grid.grid)}"></game-board>
     </div>
-    <div class="timer"></div>
+    <timer></timer>
   `;

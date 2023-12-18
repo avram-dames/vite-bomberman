@@ -1,116 +1,146 @@
-import { GameState, Direction, Bomb, Fire } from "./types";
-import { updateTimer, updateGrid } from "./ui";
+import { Position } from "./types";
+import { GameBoard } from "./grid";
+import { Player } from "./player";
+import { Bomb } from "./bomb";
+import { Fire } from "./fire";
 
-const game: GameState = {
-  clock: -1,
-  playerPosition: [0, 0],
-  // 0 - empty space
-  // 1 - fixed wall
-  // 2 - removable obstacle
-  grid: [
+interface GameState {
+  clock: number;
+  player: Player;
+  grid: GameBoard;
+
+  // refactor: move to own module
+  eventHashTable: {
+    [k: number]: (Bomb | Fire)[];
+  };
+  eventHashIndex: number[];
+
+  // refactor: move to item class
+  bombTime: number;
+  fireTime: number;
+  fireSpread: number;
+
+  tick: () => void;
+  updateGrid: (items: (Bomb | Fire)[]) => void;
+  createBomb: (position: Position) => Bomb;
+  placeBomb: (position: Position) => void;
+  detonateBomb: (bomb: Bomb) => void;
+  consumeEvents: () => void;
+  handleEvent: (item: Bomb | Fire) => void;
+  updateEventHashTable: (index: number, item: (Bomb | Fire)[]) => void;
+  getDueEventsIndexes: () => number[];
+}
+
+const gameBoard = new GameBoard(
+  [
     [0, 1],
     [0, 2],
   ],
-  gridSize: 2,
-  bombQueue: [],
+  2,
+);
+
+const player = new Player([0, 0]);
+
+export const game: GameState = {
+  clock: -1,
+  grid: gameBoard,
+  player: player,
   bombTime: 3,
-  fireQueue: [],
   fireTime: 1,
   fireSpread: 1,
+  eventHashTable: {},
+  eventHashIndex: [],
 
   tick() {
     this.clock++;
-    updateTimer(this.clock);
-    this.detonateBombs();
-    this.clearFires();
+    this.consumeEvents();
+    console.log("tick", this.clock);
   },
 
-  placeBomb() {
-    /**
-     * Place a bomb at current player's position
-     * and return true if it is allowed. Return false
-     * not implemented yet.
-     */
-    const newBomb: Bomb = {
-      position: [...this.playerPosition],
-      time: this.clock + this.bombTime,
-    };
-    const [top, right] = newBomb.position;
-    this.grid[top][right] = 3;
-    this.bombQueue.push(newBomb);
-    return true;
+  updateEventHashTable(index, items) {
+    if (this.eventHashIndex.includes(index)) {
+      this.eventHashTable[index].push(...items);
+    } else {
+      this.eventHashIndex.push(index);
+      this.eventHashTable[index] = items;
+    }
   },
 
-  clearFires() {
-    if (this.fireQueue.length) {
-      for (const fire of checkForItemsReadyToAction(
-        this.fireQueue,
-        this.clock,
-      )) {
-        this.clearFire(fire);
+  consumeEvents() {
+    this.getDueEventsIndexes().forEach((index) => {
+      this.eventHashTable[index].forEach((item) => {
+        this.handleEvent(item);
+      });
+      this.eventHashTable[index] = [];
+      const i = this.eventHashIndex.indexOf(index);
+      if (i > -1) {
+        this.eventHashIndex.splice(index, 1);
       }
+    });
+  },
+
+  handleEvent(item) {
+    console.log("event handled", item);
+
+    if (item instanceof Bomb) {
+      this.detonateBomb(item);
+    } else if (item instanceof Fire) {
+      // the problem is that we need to handle all events of a type at the same time
+      // so we don't update the grid after each item update
     }
   },
 
-  clearFire(fire) {
-    const [x, y] = fire.position;
-    this.grid[x][y] = 0;
-    for (let index = 1; index < fire.spread + 1; index++) {
-      if (this.grid[x - index]) this.grid[x - index][y] = 0;
-      if (this.grid[x + index]) this.grid[x + index][y] = 0;
-      if (this.grid[x][y - index]) this.grid[x][y - index] = 0;
-      if (this.grid[x][y + index]) this.grid[x][y + index] = 0;
-    }
-    updateGrid(this.grid);
+  getDueEventsIndexes() {
+    return this.eventHashIndex.filter((index) => index <= this.clock);
   },
 
-  detonateBombs() {
-    if (this.bombQueue.length) {
-      for (const bomb of checkForItemsReadyToAction(
-        this.bombQueue,
-        this.clock,
-      )) {
-        this.detonateBomb(bomb);
-      }
-    }
+  updateGrid(items) {
+    items.forEach((item) => {
+      const [top, right] = item.position;
+      this.grid.grid[top][right] = item.id;
+    });
+    window.dispatchEvent(new Event("gridupdated"));
+  },
+
+  createBomb(position) {
+    const [top, right] = position;
+    const timeToExplode = this.clock + this.bombTime;
+    const power = 1; // const for now
+    return new Bomb([top, right], timeToExplode, power);
+  },
+
+  placeBomb(position) {
+    const newBomb = this.createBomb(position);
+    this.updateGrid([newBomb]);
+    this.updateEventHashTable(newBomb.timeToExplode, [newBomb]);
   },
 
   detonateBomb(bomb) {
-    const newFire: Fire = {
-      position: [...bomb.position],
-      spread: this.fireSpread,
-      time: this.clock + this.fireTime,
-    };
+    const spread = 1;
+    const timeToClearFire = this.clock + 1;
+    const [top, right] = bomb.position;
 
-    const [x, y] = [...bomb.position];
-    this.grid[x][y] = 4;
-    for (let index = 1; index < newFire.spread + 1; index++) {
-      if (this.grid[x - index]) this.grid[x - index][y] = 4;
-      if (this.grid[x + index]) this.grid[x + index][y] = 4;
-      if (this.grid[x][y - index]) this.grid[x][y - index] = 4;
-      if (this.grid[x][y + index]) this.grid[x][y + index] = 4;
+    const fires = [new Fire([top, right], spread)];
+
+    for (let index = 1; index < spread + 1; index++) {
+      if (this.grid.grid[top - index])
+        fires.push(new Fire([top - index, right], spread));
+      if (this.grid.grid[top + index])
+        fires.push(new Fire([top + index, right], spread));
+      if (this.grid.grid[top][right - index])
+        fires.push(new Fire([top, right - index], spread));
+      if (this.grid.grid[top][right + index])
+        fires.push(new Fire([top, right + index], spread));
     }
-    updateGrid(this.grid);
-
-    this.fireQueue.push(newFire);
+    this.updateGrid(fires);
+    this.updateEventHashTable(timeToClearFire, fires);
   },
 };
 
-function isTimeToAction(item: Bomb | Fire, currentTime: number): boolean {
-  if (item.time <= currentTime) {
-    return true;
-  } else {
-    return false;
-  }
+// Event Handlers
+function handleBombPlaced(e) {
+  game.placeBomb(e.detail);
 }
 
-function* checkForItemsReadyToAction(
-  queue: Bomb[] | Fire[],
-  currentTime: number,
-): Generator<Bomb | Fire> {
-  for (const item of queue) {
-    if (isTimeToAction(item, currentTime)) yield item;
-  }
-}
-
-export { game, isTimeToAction, checkForItemsReadyToAction };
+// Event Listeners
+window.addEventListener("bombPlaced", handleBombPlaced);

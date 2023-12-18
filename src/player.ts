@@ -1,13 +1,12 @@
-import { GridObject } from "./interfaces";
-import { Position, Direction, Grid } from "./types";
+import { Position, Direction, Grid, GridObject } from "./types";
 
 export function positionIsValid(position: Position, grid: Grid): boolean {
-  const gridSize = grid.length;
+  const gridSize = grid.grid.length;
   return position[0] >= 0 &&
     position[0] <= gridSize - 1 &&
     position[1] >= 0 &&
     position[1] <= gridSize - 1 &&
-    grid[position[0]][position[1]] == 0
+    grid.grid[position[0]][position[1]] == 0
     ? true
     : false;
 }
