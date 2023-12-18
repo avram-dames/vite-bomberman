@@ -1,30 +1,38 @@
+import styles from "./robo-player.css?inline" assert { type: "css" };
+
 export default class RoboPlayer extends HTMLElement {
   templateName = "robo-player-template";
+  root: ShadowRoot;
 
   constructor() {
     super();
-
-    // Attach a shadow DOM to the element
-    const shadowRoot = this.attachShadow({ mode: "open" });
-    const template = document.getElementById(this.templateName);
-
-    if (!template) {
-      throw new Error(`Could not find ${this.templateName} template!`);
-    }
-
-    const content = template.content.cloneNode(true);
-
-    shadowRoot.appendChild(content);
+    this.root = this.attachShadow({ mode: "open" });
   }
 
-  connectedCallback() {
+  async connectedCallback() {
+    this.loadStyles();
+    await this.loadTemplate();
+
     window.addEventListener("playerpositionchanged", () => {
       this.render();
     });
     this.render();
   }
 
-  render() {}
+  async loadTemplate(): Promise<void> {
+    const content = document.createElement("div");
+    const response = await fetch("/src/components/robo-player.html");
+    content.innerHTML = await response.text();
+    this.root.appendChild(content);
+  }
+
+  loadStyles(): void {
+    const sheet = new CSSStyleSheet();
+    sheet.replaceSync(styles);
+    this.root.adoptedStyleSheets = [sheet];
+  }
+
+  render(): void {}
 }
 
 customElements.define("robo-player", RoboPlayer);
