@@ -13,7 +13,9 @@ export default class RoboPlayer extends HTMLElement {
     this.loadStyles();
     await this.loadTemplate();
 
-    window.addEventListener("playerpositionchanged", () => {
+    window.addEventListener("playerpositionchanged", (e) => {
+      const [top, right] = e.detail as [number, number];
+      this.updatePosition(top, right);
       this.render();
     });
     this.render();
@@ -30,6 +32,14 @@ export default class RoboPlayer extends HTMLElement {
     const sheet = new CSSStyleSheet();
     sheet.replaceSync(styles);
     this.root.adoptedStyleSheets = [sheet];
+  }
+
+  updatePosition(top: number, right: number): void {
+    const player: HTMLElement = this.root.querySelector(".player")!;
+    if (player) {
+      player.style.top = `${top * 100}px`;
+      player.style.right = `${right * 100}px`;
+    }
   }
 
   render(): void {}

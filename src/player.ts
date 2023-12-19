@@ -51,7 +51,11 @@ export class Player implements GridObject {
     );
     if (hasChanged) {
       this.position = [...newPosition];
-      window.dispatchEvent(new Event("playerpositionchanged")); // trigger re-render
+      window.dispatchEvent(
+        new CustomEvent("playerpositionchanged", {
+          detail: [...this.position],
+        }),
+      );
     }
   }
 

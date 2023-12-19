@@ -1,6 +1,5 @@
 import "./style.css";
 import "./init";
-console.log("running main");
 import { game } from "./gameState";
 import RoboPlayer from "./components/robo-player.ts";
 import GameBoard from "./components/game-board.ts";
