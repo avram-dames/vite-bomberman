@@ -1,57 +1,18 @@
-import "./style.css";
-import "./init";
-import { game } from "./gameState";
+import "./main.css";
+import { initApp, startGameLoop } from "./helpers.ts";
+import { handleKeyStrokes, handleBombPlaced } from "./state/event-handlers.ts";
+
 import RoboPlayer from "./components/robo-player.ts";
 import GameBoard from "./components/game-board.ts";
 
-new RoboPlayer();
-
+// Register Custom Elements
 customElements.define("game-board", GameBoard);
+customElements.define("robo-player", RoboPlayer);
 
-window.addEventListener(
-  "keydown",
-  (event) => {
-    if (event.defaultPrevented) {
-      return; // Do nothing if event already handled
-    }
-    console.log(`${event.code} key pressed.`);
+// Initialize App
+initApp();
+startGameLoop();
 
-    switch (event.code) {
-      case "KeyS":
-      case "ArrowDown":
-        game.player.move("down", game.grid);
-        break;
-      case "KeyW":
-      case "ArrowUp":
-        game.player.move("up", game.grid);
-        break;
-      case "KeyA":
-      case "ArrowLeft":
-        game.player.move("left", game.grid);
-        break;
-      case "KeyD":
-      case "ArrowRight":
-        game.player.move("right", game.grid);
-        break;
-      case "Space":
-        console.log("space");
-        game.player.placeBomb();
-        break;
-    }
-
-    if (event.code !== "Tab") {
-      // Consume the event so it doesn't get handled twice,
-      // as long as the user isn't trying to move focus away
-      event.preventDefault();
-    }
-  },
-  true,
-);
-
-document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
-    <div class="dashboard">
-      <robo-player></robo-player>
-      <game-board data-grid="${JSON.stringify(game.grid.grid)}"></game-board>
-    </div>
-    <timer></timer>
-  `;
+// Event Listeners
+window.addEventListener("keydown", handleKeyStrokes);
+window.addEventListener("bombPlaced", handleBombPlaced);

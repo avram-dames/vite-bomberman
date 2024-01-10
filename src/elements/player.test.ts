@@ -1,11 +1,15 @@
 import { expect, test } from "vitest";
-import { Position } from "./types";
+import { Position } from "../types";
 import { positionIsValid, movePlayer } from "./player";
+import { GameBoard } from "./gameBoard";
 
-const grid = [
-  [0, 1],
-  [0, 2],
-];
+const grid = new GameBoard(
+  [
+    [0, 1],
+    [0, 2],
+  ],
+  2,
+);
 const initialPosition: Position = [0, 0];
 const bottomLeftPosition: Position = [1, 0];
 const topRightPosition: Position = [0, 1];

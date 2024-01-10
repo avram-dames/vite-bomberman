@@ -1,6 +1,6 @@
-import { GridObject, Position } from "./types";
+import { Element, Position } from "../types";
 
-export class Bomb implements GridObject {
+export class Bomb implements Element {
   id = 3;
 
   constructor(

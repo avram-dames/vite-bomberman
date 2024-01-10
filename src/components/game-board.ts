@@ -1,4 +1,5 @@
 import styles from "./game-board.css?inline" assert { type: "css" };
+import game from "../state/game.ts";
 
 export default class GameBoard extends HTMLElement {
   templateName = "game-board-template";
@@ -19,6 +20,11 @@ export default class GameBoard extends HTMLElement {
     this.render();
   }
 
+  render(): void {
+    this.root.querySelector<HTMLDivElement>(".grid")!.innerHTML =
+      createGridElements(game.data.grid.grid);
+  }
+
   async loadTemplate(): Promise<void> {
     const content = document.createElement("div");
     const response = await fetch("/src/components/game-board.html");
@@ -30,13 +36,6 @@ export default class GameBoard extends HTMLElement {
     const sheet = new CSSStyleSheet();
     sheet.replaceSync(styles);
     this.root.adoptedStyleSheets = [sheet];
-  }
-
-  render(): void {
-    if (this.dataset.grid) {
-      this.root.querySelector<HTMLDivElement>(".grid")!.innerHTML =
-        createGridElements(JSON.parse(this.dataset.grid));
-    }
   }
 }
 

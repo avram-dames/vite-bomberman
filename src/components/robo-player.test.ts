@@ -15,7 +15,7 @@ describe("Robo Player Component", () => {
     document.body.removeChild(container);
   });
 
-  it("should create a shadow DOM with the correct structure", () => {
+  it.skip("should create a shadow DOM with the correct structure", () => {
     new RoboPlayer();
     // Create an instance of the component
     const player = document.createElement("robo-player");

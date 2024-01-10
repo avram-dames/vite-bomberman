@@ -1,4 +1,4 @@
-import { Position, Direction, Grid, GridObject } from "./types";
+import { Position, Direction, Grid, Element } from "../types";
 
 export function positionIsValid(position: Position, grid: Grid): boolean {
   const gridSize = grid.grid.length;
@@ -40,7 +40,7 @@ export function movePlayer(
   }
 }
 
-export class Player implements GridObject {
+export class Player implements Element {
   constructor(public position: Position) {}
 
   move(direction: Direction, grid: Grid): void {

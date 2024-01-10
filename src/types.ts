@@ -7,8 +7,8 @@ interface Grid {
   size: number;
 }
 
-interface GridObject {
+interface Element {
   position: Position;
 }
 
-export type { Grid, Position, Direction, GridObject };
+export type { Grid, Position, Direction, Element };
