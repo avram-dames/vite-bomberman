@@ -43,13 +43,14 @@ const game: GameState = {
   data: {
     clock: -1,
     grid: new GameBoard([
-      [0, 0, 0, 0],
-      [0, 1, 0, 0],
-      [0, 2, 0, 0],
-      [0, 2, 0, 0],
+      [0, 2, 0, 0, 2],
+      [0, 1, 0, 1, 2],
+      [0, 2, 2, 0, 0],
+      [0, 1, 0, 1, 2],
+      [2, 2, 0, 2, 2],
     ]),
     player: new Player([0, 0]),
-    bombTime: 3,
+    bombTime: 1,
     fireTime: 1,
     fireSpread: 1,
     eventHashTable: {},
@@ -59,7 +60,7 @@ const game: GameState = {
   tick() {
     this.data.clock++;
     this.consumeEvents();
-    console.log("tick", this.data.clock);
+    console.log("Tick", this.data);
   },
 
   updateEventHashTable(index, items) {
@@ -136,13 +137,13 @@ const game: GameState = {
     const fires = [new Fire([top, left], spread)];
 
     for (let index = 1; index < spread + 1; index++) {
-      if (this.data.grid.grid[top - index])
+      if (this.data.grid.isElementInflammable(top - index, left))
         fires.push(new Fire([top - index, left], spread));
-      if (this.data.grid.grid[top + index])
+      if (this.data.grid.isElementInflammable(top + index, left))
         fires.push(new Fire([top + index, left], spread));
-      if (this.data.grid.grid[top][left - index])
+      if (this.data.grid.isElementInflammable(top, left - index))
         fires.push(new Fire([top, left - index], spread));
-      if (this.data.grid.grid[top][left + index])
+      if (this.data.grid.isElementInflammable(top, left + index))
         fires.push(new Fire([top, left + index], spread));
     }
     this.updateGrid(fires);
