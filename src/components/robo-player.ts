@@ -11,20 +11,16 @@ export default class RoboPlayer extends HTMLElement {
 
   async connectedCallback() {
     this.loadStyles();
-    await this.loadTemplate();
+
+    const content = document.createElement("div");
+    content.classList.add("player");
+    this.root.appendChild(content);
 
     window.addEventListener("playerpositionchanged", (e) => {
       // expects event of type CustomEvent which has a detail property
       const [top, left] = e.detail as [number, number];
       this.updatePosition(top, left);
     });
-  }
-
-  async loadTemplate(): Promise<void> {
-    const content = document.createElement("div");
-    const response = await fetch("/src/components/robo-player.html");
-    content.innerHTML = await response.text();
-    this.root.appendChild(content);
   }
 
   loadStyles(): void {

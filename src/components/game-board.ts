@@ -10,14 +10,15 @@ export default class GameBoard extends HTMLElement {
     this.root = this.attachShadow({ mode: "open" });
   }
 
-  async connectedCallback() {
+  connectedCallback() {
     this.loadStyles();
-    await this.loadTemplate();
 
-    const gridEl = this.root.querySelector<HTMLDivElement>(".grid")!;
+    const gridEl = document.createElement("div");
+    gridEl.classList.add("grid");
     gridEl.style.gridTemplateColumns = `repeat(${game.data.grid.size}, minmax(0, 1fr))`;
     gridEl.style.width = `${game.data.grid.size * 100}px`;
     gridEl.style.height = `${game.data.grid.size * 100}px`;
+    this.root.appendChild(gridEl);
 
     window.addEventListener("gridupdated", () => {
       this.render();
@@ -28,13 +29,6 @@ export default class GameBoard extends HTMLElement {
   render(): void {
     this.root.querySelector<HTMLDivElement>(".grid")!.innerHTML =
       createGridElements(game.data.grid.grid);
-  }
-
-  async loadTemplate(): Promise<void> {
-    const content = document.createElement("div");
-    const response = await fetch("/src/components/game-board.html");
-    content.innerHTML = await response.text();
-    this.root.appendChild(content);
   }
 
   loadStyles(): void {
