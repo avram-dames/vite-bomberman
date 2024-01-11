@@ -24,7 +24,6 @@ describe("Robo Player Component", () => {
     // Check if the shadow DOM is present
     const shadowRoot = player.shadowRoot;
     expect(shadowRoot).to.exist;
-    console.log(shadowRoot.innerHTML);
 
     // // Check if the shadow DOM contains the expected structure
     const templateContent = shadowRoot.querySelector(".player");
