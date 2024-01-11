@@ -14,6 +14,11 @@ export default class GameBoard extends HTMLElement {
     this.loadStyles();
     await this.loadTemplate();
 
+    const gridEl = this.root.querySelector<HTMLDivElement>(".grid")!;
+    gridEl.style.gridTemplateColumns = `repeat(${game.data.grid.size}, minmax(0, 1fr))`;
+    gridEl.style.width = `${game.data.grid.size * 100}px`;
+    gridEl.style.height = `${game.data.grid.size * 100}px`;
+
     window.addEventListener("gridupdated", () => {
       this.render();
     });
