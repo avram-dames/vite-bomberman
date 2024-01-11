@@ -24,14 +24,11 @@ body {
   display: flex;
   place-items: center;
   justify-content: center;
-  min-width: 320px;
   min-height: 100vh;
   background-color: antiquewhite;
 }
 
 .container {
   position: relative;
-  width: 200px;
-  height: 200px;
   background-color: white;
 }
