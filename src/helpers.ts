@@ -2,10 +2,8 @@ import game from "./state/game.ts";
 
 export function initApp() {
   document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
-      <div class="container">
-        <robo-player></robo-player>
-        <game-board></game-board>
-      </div>
+      <robo-player></robo-player>
+      <game-board></game-board>
     `;
 }
 
