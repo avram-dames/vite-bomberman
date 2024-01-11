@@ -42,13 +42,12 @@ const game: GameState = {
 
   data: {
     clock: -1,
-    grid: new GameBoard(
-      [
-        [0, 1],
-        [0, 2],
-      ],
-      2,
-    ),
+    grid: new GameBoard([
+      [0, 0, 0, 0],
+      [0, 1, 0, 0],
+      [0, 2, 0, 0],
+      [0, 2, 0, 0],
+    ]),
     player: new Player([0, 0]),
     bombTime: 3,
     fireTime: 1,

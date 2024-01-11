@@ -1,10 +1,10 @@
 import { Grid } from "../types";
 
 export class GameBoard implements Grid {
-  constructor(
-    public grid: number[][],
-    public size: number,
-  ) {}
+  size: number;
+  constructor(public grid: number[][]) {
+    this.size = grid.length;
+  }
 
   stringify() {
     const d = {
